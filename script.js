@@ -27,8 +27,9 @@ const handleUmamiTracking = () => {
 
     window.umami.track = function (eventName, eventData) {
       const isCustomEvent = typeof eventName === "string";
+      const url = window.location.href.split("?")[0];
       if (isCustomEvent) {
-        return originalTrack(eventName, Object.assign({}, utms, eventData || {}));
+        return originalTrack(eventName, Object.assign({ page_url: url }, utms, eventData || {}));
       }
       // Object form is for overriding the pageview payload — pass through untouched.
       return originalTrack(eventName);
