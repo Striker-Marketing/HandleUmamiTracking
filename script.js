@@ -45,8 +45,5 @@ const handleUmamiTracking = () => {
   // 2. Make every future umami.track() call carry the stored UTMs.
   const storedUtms = loadUtms();
   attachUtmsToTrack(storedUtms);
-
-  // 3. Track the initial pageview (it'll pick up the UTMs via the wrapper).
-  window.umami.track("Page View");
 };
 handleUmamiTracking();
