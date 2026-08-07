@@ -1,5 +1,11 @@
-const handleUmamiTracking = () => {
-  if (!window.umami) return;
+const handleUmamiTracking = (attempt) => {
+  if (!window.umami) {
+    if ((attempt || 0) >= 15) return;
+    setTimeout(function () {
+      handleUmamiTracking((attempt || 0) + 1);
+    }, 200);
+    return;
+  }
 
   const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
   const STORAGE_KEY = "utm_attribution";
