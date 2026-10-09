@@ -1,12 +1,10 @@
-const handleUmamiTracking = (attempt) => {
-  if (!window.umami) {
-    if ((attempt || 0) >= 15) return;
-    setTimeout(function () {
-      handleUmamiTracking((attempt || 0) + 1);
-    }, 200);
+const handleUmamiTracking = (umamiSiteId) => {
+  if (!umamiSiteId) {
+    console.warn("handleUmamiTracking: umamiSiteId is required");
     return;
   }
 
+  const UMAMI_SRC = "https://umami.striker.marketing/script.js";
   const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
   const STORAGE_KEY = "utm_attribution";
 
@@ -42,14 +40,34 @@ const handleUmamiTracking = (attempt) => {
     };
   }
 
-  // 1. Capture UTMs from the current URL and persist them for the session.
-  const incomingUtms = readUtmsFromUrl();
-  if (Object.keys(incomingUtms).length > 0) {
-    saveUtms(incomingUtms);
+  function setup() {
+    // 1. Capture UTMs from the current URL and persist them for the session.
+    const incomingUtms = readUtmsFromUrl();
+    if (Object.keys(incomingUtms).length > 0) {
+      saveUtms(incomingUtms);
+    }
+
+    // 2. Make every future umami.track() call carry the stored UTMs.
+    const storedUtms = loadUtms();
+    attachUtmsToTrack(storedUtms);
   }
 
-  // 2. Make every future umami.track() call carry the stored UTMs.
-  const storedUtms = loadUtms();
-  attachUtmsToTrack(storedUtms);
+  if (window.umami) {
+    setup();
+    return;
+  }
+
+  // Load the Umami tracker, reusing an existing tag if one was already injected.
+  const existingScript = document.querySelector('script[src="' + UMAMI_SRC + '"]');
+  if (existingScript) {
+    existingScript.addEventListener("load", setup);
+    return;
+  }
+
+  const script = document.createElement("script");
+  script.src = UMAMI_SRC;
+  script.defer = true;
+  script.setAttribute("data-website-id", umamiSiteId);
+  script.onload = setup;
+  document.head.appendChild(script);
 };
-handleUmamiTracking();
