@@ -68,6 +68,7 @@ const handleUmamiTracking = (umamiSiteId) => {
   script.src = UMAMI_SRC;
   script.defer = true;
   script.setAttribute("data-website-id", umamiSiteId);
+  script.setAttribute("data-performance", "true");
   script.onload = setup;
   document.head.appendChild(script);
 };
