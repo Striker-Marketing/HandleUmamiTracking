@@ -10,3 +10,9 @@
 ```
 
 `handleUmamiTracking` injects the Umami script (`https://umami.striker.marketing/script.js`) with the given website ID, so the site must not also include the Umami `<script>` tag.
+
+To capture extra URL params beyond the default UTMs, pass them as an optional second argument:
+
+```
+handleUmamiTracking("YOUR-UMAMI-WEBSITE-ID", ["gclid", "fbclid"]);
+```

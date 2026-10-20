@@ -1,11 +1,11 @@
-const handleUmamiTracking = (umamiSiteId) => {
+const handleUmamiTracking = (umamiSiteId, additionalUrlParams = []) => {
   if (!umamiSiteId) {
     console.warn("handleUmamiTracking: umamiSiteId is required");
     return;
   }
 
   const UMAMI_SRC = "https://umami.striker.marketing/script.js";
-  const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
+  const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", ...additionalUrlParams];
   const STORAGE_KEY = "utm_attribution";
 
   function readUtmsFromUrl() {
