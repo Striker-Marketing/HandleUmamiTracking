@@ -50,6 +50,11 @@ const handleUmamiTracking = (umamiSiteId, additionalUrlParams = []) => {
     // 2. Make every future umami.track() call carry the stored UTMs.
     const storedUtms = loadUtms();
     attachUtmsToTrack(storedUtms);
+
+    // 3. Send a custom pageview carrying the additional params.
+    if (additionalUrlParams.length > 0) {
+      window.umami.track("PageView Custom");
+    }
   }
 
   if (window.umami) {
