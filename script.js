@@ -92,3 +92,18 @@ const handleUmamiTracking = (umamiSiteId, additionalUrlParams = []) => {
   script.onload = setup;
   document.head.appendChild(script);
 };
+
+// Auto-init when loaded via <script src="..." data-website-id="..."> so no extra call is needed.
+// Optional: data-additional-params="gclid,fbclid" to capture extra URL params.
+(function () {
+  const currentScript = document.currentScript;
+  const websiteId = currentScript && currentScript.getAttribute("data-website-id");
+  if (!websiteId) return;
+
+  const additionalParams = (currentScript.getAttribute("data-additional-params") || "")
+    .split(",")
+    .map(function (param) { return param.trim(); })
+    .filter(Boolean);
+
+  handleUmamiTracking(websiteId, additionalParams);
+})();
