@@ -8,6 +8,11 @@ const handleUmamiTracking = (umamiSiteId, additionalUrlParams = []) => {
   const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", ...additionalUrlParams];
   const STORAGE_KEY = "utm_attribution";
 
+  function getGbUuid() {
+    const m = document.cookie.match(/(^|;)\s*gbuuid=([^;]*)/);
+    return m ? m[2] : undefined;
+  }
+
   function readUtmsFromUrl() {
     const params = new URLSearchParams(window.location.search);
     const utms = {};
@@ -33,7 +38,17 @@ const handleUmamiTracking = (umamiSiteId, additionalUrlParams = []) => {
       const isCustomEvent = typeof eventName === "string";
       const url = window.location.href.split("?")[0];
       if (isCustomEvent) {
-        return originalTrack(eventName, Object.assign({ page_url: url }, utms, eventData || {}));
+        // Read at call time — the cookie may not exist yet when setup() runs.
+        const gbUuid = getGbUuid();
+        return originalTrack(
+          eventName,
+          Object.assign(
+            { page_url: url },
+            utms,
+            gbUuid ? { gb_uuid: gbUuid } : {},
+            eventData || {}
+          )
+        );
       }
       // Object form is for overriding the pageview payload — pass through untouched.
       return originalTrack(eventName);
@@ -47,7 +62,7 @@ const handleUmamiTracking = (umamiSiteId, additionalUrlParams = []) => {
       saveUtms(incomingUtms);
     }
 
-    // 2. Make every future umami.track() call carry the stored UTMs.
+    // 2. Make every future umami.track() call carry the stored UTMs + gb_uuid.
     const storedUtms = loadUtms();
     attachUtmsToTrack(storedUtms);
 
