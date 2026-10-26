@@ -5,7 +5,7 @@ const handleUmamiTracking = (umamiSiteId, additionalUrlParams = []) => {
   }
 
   const UMAMI_SRC = "https://umami.striker.marketing/script.js";
-  const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", ...additionalUrlParams];
+  const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "campaign_id", "adset_id", "ad_id", ...additionalUrlParams];
   const STORAGE_KEY = "utm_attribution";
 
   function getGbUuid() {
