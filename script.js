@@ -1,10 +1,11 @@
-const handleUmamiTracking = (umamiSiteId, additionalUrlParams = []) => {
+const handleUmamiTracking = (umamiSiteId, additionalUrlParams = [], enableRecorder = false) => {
   if (!umamiSiteId) {
     console.warn("handleUmamiTracking: umamiSiteId is required");
     return;
   }
 
   const UMAMI_SRC = "https://umami.striker.marketing/script.js";
+  const RECORDER_SRC = "https://umami.striker.marketing/recorder.js";
   const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "campaign_id", "adset_id", "ad_id", ...additionalUrlParams];
   const STORAGE_KEY = "utm_attribution";
 
@@ -72,6 +73,15 @@ const handleUmamiTracking = (umamiSiteId, additionalUrlParams = []) => {
     }
   }
 
+  // Load the Umami session recorder, unless a tag for it is already on the page.
+  if (enableRecorder && !document.querySelector('script[src="' + RECORDER_SRC + '"]')) {
+    const recorder = document.createElement("script");
+    recorder.src = RECORDER_SRC;
+    recorder.defer = true;
+    recorder.setAttribute("data-website-id", umamiSiteId);
+    document.head.appendChild(recorder);
+  }
+
   if (window.umami) {
     setup();
     return;
@@ -95,6 +105,7 @@ const handleUmamiTracking = (umamiSiteId, additionalUrlParams = []) => {
 
 // Auto-init when loaded via <script src="..." data-website-id="..."> so no extra call is needed.
 // Optional: data-additional-params="gclid,fbclid" to capture extra URL params.
+// Optional: data-recorder="true" to also load the Umami session recorder.
 (function () {
   const currentScript = document.currentScript;
   const websiteId = currentScript && currentScript.getAttribute("data-website-id");
@@ -105,5 +116,7 @@ const handleUmamiTracking = (umamiSiteId, additionalUrlParams = []) => {
     .map(function (param) { return param.trim(); })
     .filter(Boolean);
 
-  handleUmamiTracking(websiteId, additionalParams);
+  const enableRecorder = currentScript.getAttribute("data-recorder") === "true";
+
+  handleUmamiTracking(websiteId, additionalParams, enableRecorder);
 })();
