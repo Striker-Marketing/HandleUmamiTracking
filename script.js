@@ -1,11 +1,13 @@
-const handleUmamiTracking = (umamiSiteId, additionalUrlParams = [], enableRecorder = false) => {
+const handleUmamiTracking = (umamiSiteId, additionalUrlParams = [], enableRecorder = false, umamiDomain = "umami.striker.marketing") => {
   if (!umamiSiteId) {
     console.warn("handleUmamiTracking: umamiSiteId is required");
     return;
   }
 
-  const UMAMI_SRC = "https://umami.striker.marketing/script.js";
-  const RECORDER_SRC = "https://umami.striker.marketing/recorder.js";
+  // Accept "umami.example.com" or a full origin like "https://umami.example.com/".
+  const UMAMI_ORIGIN = (/^https?:\/\//.test(umamiDomain) ? umamiDomain : "https://" + umamiDomain).replace(/\/+$/, "");
+  const UMAMI_SRC = UMAMI_ORIGIN + "/script.js";
+  const RECORDER_SRC = UMAMI_ORIGIN + "/recorder.js";
   const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "campaign_id", "adset_id", "ad_id", ...additionalUrlParams];
   const STORAGE_KEY = "utm_attribution";
 
@@ -106,6 +108,7 @@ const handleUmamiTracking = (umamiSiteId, additionalUrlParams = [], enableRecord
 // Auto-init when loaded via <script src="..." data-website-id="..."> so no extra call is needed.
 // Optional: data-additional-params="gclid,fbclid" to capture extra URL params.
 // Optional: data-recorder="true" to also load the Umami session recorder.
+// Optional: data-umami-domain="umami.example.com" to load Umami from another host.
 (function () {
   const currentScript = document.currentScript;
   const websiteId = currentScript && currentScript.getAttribute("data-website-id");
@@ -118,5 +121,7 @@ const handleUmamiTracking = (umamiSiteId, additionalUrlParams = [], enableRecord
 
   const enableRecorder = currentScript.getAttribute("data-recorder") === "true";
 
-  handleUmamiTracking(websiteId, additionalParams, enableRecorder);
+  const umamiDomain = currentScript.getAttribute("data-umami-domain") || undefined;
+
+  handleUmamiTracking(websiteId, additionalParams, enableRecorder, umamiDomain);
 })();

@@ -31,6 +31,16 @@ To also load the Umami session recorder (`https://umami.striker.marketing/record
   defer></script>
 ```
 
+To load Umami from a different host (default `umami.striker.marketing`), add `data-umami-domain`. The script and the recorder both load from this host:
+
+```
+<script
+  src="https://cdn.jsdelivr.net/gh/Striker-Marketing/HandleUmamiTracking@2/script.min.js"
+  data-website-id="YOUR-UMAMI-WEBSITE-ID"
+  data-umami-domain="umami.example.com"
+  defer></script>
+```
+
 ## GTM DOM Loaded
 
 Without `data-website-id` on the tag, nothing runs automatically, so you can still load it and call the function manually (e.g. from a GTM tag):
@@ -39,7 +49,7 @@ Without `data-website-id` on the tag, nothing runs automatically, so you can sti
 <script>
   document.head.appendChild(Object.assign(document.createElement("script"), {
     src: "https://cdn.jsdelivr.net/gh/Striker-Marketing/HandleUmamiTracking@2/script.min.js?cb=" + Math.floor(Date.now() / 600000),
-    onload: function () { handleUmamiTracking("YOUR-UMAMI-WEBSITE-ID", ["gclid", "fbclid"], true); }, // 3rd arg: load recorder
+    onload: function () { handleUmamiTracking("YOUR-UMAMI-WEBSITE-ID", ["gclid", "fbclid"], true, "umami.example.com"); }, // 3rd arg: load recorder, 4th arg: Umami domain (optional)
   }));
 </script>
 ```
